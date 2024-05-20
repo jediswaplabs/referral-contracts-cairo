@@ -1,0 +1,4 @@
+[sncast.default]
+account = "my_imported_account"
+accounts-file = "~/my_accounts.json"
+url = "https://api-starknet-sepolia.dwellir.com/dd28e566-3260-4d8d-8180-6ef1a161e41c"

@@ -1,0 +1,18 @@
+[package]
+name = "gmx_referral_cairo"
+version = "0.1.0"
+
+[lib]
+
+
+[[target.starknet-contract]]
+sierra = true
+casm = true
+casm-add-pythonic-hints = true
+allowed-libfuncs-list.name = "all"
+build-external-contracts = ["openzeppelin::presets::erc20::ERC20"]
+
+[dependencies]
+starknet = "2.4.3"
+openzeppelin = { git = "https://github.com/OpenZeppelin/cairo-contracts.git", tag = "v0.11.0" }
+snforge_std = { git = "https://github.com/foundry-rs/starknet-foundry.git", tag = "v0.20.1" }
