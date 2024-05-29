@@ -4,7 +4,7 @@ use zeroable::Zeroable;
 
 #[starknet::interface]
 trait IReferralStorageV2<TContractState> {
-    fn get_trader_referral_code(
+    fn get_referrer(
         ref self: TContractState,
         _account: ContractAddress,
     ) -> felt252;
@@ -19,7 +19,7 @@ trait IReferralStorageV2<TContractState> {
         _account: ContractAddress,
     ) -> felt252;
 
-    fn set_trader_referral_code(
+    fn set_referrer(
         ref self: TContractState,
         _code: felt252,
     );
@@ -51,7 +51,7 @@ mod ReferralStorageV2 {
     #[event]
     #[derive(Drop, starknet::Event)]
     enum Event {
-        SetTraderReferralCode: SetTraderReferralCode,
+        SetReferrer: SetReferrer,
         RegisterCode: RegisterCode,
         #[flat]
         OwnableEvent: OwnableComponent::Event,
@@ -61,7 +61,7 @@ mod ReferralStorageV2 {
 
 
     #[derive(Drop, starknet::Event)]
-    struct SetTraderReferralCode {
+    struct SetReferrer {
         account: ContractAddress,
         code: felt252,
     }
@@ -76,7 +76,7 @@ mod ReferralStorageV2 {
     struct Storage {
         code_owner: LegacyMap::<felt252, ContractAddress>,
         owner_to_code: LegacyMap::<ContractAddress, felt252>,
-        trader_referral_codes: LegacyMap::<ContractAddress, felt252>,
+        referrers: LegacyMap::<ContractAddress, felt252>,
         #[substorage(v0)]
         ownable: OwnableComponent::Storage,
         #[substorage(v0)]
@@ -99,11 +99,11 @@ mod ReferralStorageV2 {
     #[abi(embed_v0)]
     impl ReferralStorageV2 of super::IReferralStorageV2<ContractState> {
 
-        fn get_trader_referral_code(
+        fn get_referrer(
             ref self: ContractState,
             _account: ContractAddress,
         ) -> felt252 {
-             self.trader_referral_codes.read(_account)
+             self.referrers.read(_account)
         }
 
         fn get_code_owner(
@@ -120,16 +120,16 @@ mod ReferralStorageV2 {
             self.owner_to_code.read(_account)
         }
 
-        fn set_trader_referral_code(
+        fn set_referrer(
             ref self: ContractState,
             _code: felt252,
         ){
             assert!(self.code_owner.read(_code).is_non_zero(), "ReferralStorage: code not found");
-            assert!(self.code_owner.read(_code) != get_caller_address(), "ReferralStorage: code owner cannot set code for himself");
+            assert!(self.code_owner.read(_code) != get_caller_address(), "ReferralStorage: referrer cannot refer himself");
 
             let _account = get_caller_address();
-            self.trader_referral_codes.write(_account, _code);
-            self.emit(SetTraderReferralCode{account:_account, code: _code});  
+            self.referrers.write(_account, _code);
+            self.emit(SetReferrer{account:_account, code: _code});  
         }
 
         fn register_code(

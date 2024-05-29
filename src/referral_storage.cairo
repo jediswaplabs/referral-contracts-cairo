@@ -4,14 +4,14 @@ use zeroable::Zeroable;
 
 #[starknet::interface]
 trait IReferralStorage<TContractState> {
-    fn get_trader_referral_code(
+    fn get_referrer(
          self: @TContractState,
         _account: ContractAddress,
     ) -> ContractAddress;
 
-    fn set_trader_referral_code(
+    fn set_referrer(
         ref self: TContractState,
-        _code: ContractAddress,
+        _address: ContractAddress,
     );
 
     fn upgrade(ref self: TContractState, new_class_hash: ClassHash);
@@ -28,7 +28,6 @@ mod ReferralStorage {
     use openzeppelin::upgrades::UpgradeableComponent;
     use openzeppelin::upgrades::interface::IUpgradeable;
 
-
     component!(path: UpgradeableComponent, storage: upgradeable_storage, event: UpgradeableEvent);
     component!(path: OwnableComponent, storage: ownable, event: OwnableEvent);
 
@@ -43,7 +42,7 @@ mod ReferralStorage {
     #[event]
     #[derive(Drop, starknet::Event)]
     enum Event {
-        SetTraderReferralCode: SetTraderReferralCode,
+        SetReferrer: SetReferrer,
         #[flat]
         OwnableEvent: OwnableComponent::Event,
         #[flat]
@@ -52,15 +51,15 @@ mod ReferralStorage {
 
 
     #[derive(Drop, starknet::Event)]
-    struct SetTraderReferralCode {
+    struct SetReferrer {
         account: ContractAddress,
-        code: ContractAddress,
+        referrer: ContractAddress,
     }
 
     #[storage]
     struct Storage {
-        // @notice Maps the trader to the referee code
-        trader_referral_codes: LegacyMap::<ContractAddress, ContractAddress>,
+        // @notice Maps the referee to the referrer
+        referrers: LegacyMap::<ContractAddress, ContractAddress>,
         
         #[substorage(v0)]
         ownable: OwnableComponent::Storage,
@@ -76,27 +75,27 @@ mod ReferralStorage {
     #[abi(embed_v0)]
     impl ReferralStorage of super::IReferralStorage<ContractState> {
 
-        fn get_trader_referral_code(
+        fn get_referrer(
              self: @ContractState,
             _account: ContractAddress,
         ) -> ContractAddress {
-             self.trader_referral_codes.read(_account)
+             self.referrers.read(_account)
         }
 
-        // @notice Sets the code to be referred by the trader
-        // @param _code The code to set
-        // @dev Trader can set the code only once
-        // @dev Code owner cannot set the code for himself
-        fn set_trader_referral_code(
+        // @notice Sets the referrer to be referred by the caller
+        // @param _address The referrer to set
+        // @dev An address can set the referrer only once
+        // @dev referrer cannot set refer himself
+        fn set_referrer(
             ref self: ContractState,
-            _code: ContractAddress,
+            _address: ContractAddress,
         ){
-            assert!(_code != get_caller_address(), "ReferralStorage: code owner cannot set code for himself");
+            assert!(_address != get_caller_address(), "ReferralStorage: referrer cannot refer himself");
 
-            if(!self.trader_referral_codes.read(get_caller_address()).is_non_zero()){
+            if(!self.referrers.read(get_caller_address()).is_non_zero()){
                 let _account = get_caller_address();
-                self.trader_referral_codes.write(_account, _code);
-                self.emit(SetTraderReferralCode{account:_account, code: _code});              
+                self.referrers.write(_account, _address);
+                self.emit(SetReferrer{account:_account, referrer: _address});              
             }
         }
 

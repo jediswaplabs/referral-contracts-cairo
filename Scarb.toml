@@ -1,5 +1,5 @@
 [package]
-name = "gmx_referral_cairo"
+name = "jediswap_referral"
 version = "0.1.0"
 
 [lib]
@@ -10,7 +10,6 @@ sierra = true
 casm = true
 casm-add-pythonic-hints = true
 allowed-libfuncs-list.name = "all"
-build-external-contracts = ["openzeppelin::presets::erc20::ERC20"]
 
 [dependencies]
 starknet = "2.4.3"
