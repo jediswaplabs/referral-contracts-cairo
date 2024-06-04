@@ -46,7 +46,7 @@ fn test_set_referrer_self() {
 }
 
 #[test]
-#[should_panic(expected: ("Caller is not the owner",))]
+#[should_panic(expected: ('Caller is not the owner',))]
 fn test_upgrade_referral_storage_by_not_onwer() {
     let (_contract_address,dispatcher,_owner) = setup_referral_storage_dispatcher();
     
