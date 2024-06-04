@@ -59,20 +59,19 @@ fn test_upgrade_referral_storage() {
     let (contract_address,dispatcher,owner) = setup_referral_storage_dispatcher();
     
     let new_storage_class_hash = declare("ReferralStorageV2").class_hash;
+    let mut spy = spy_events(SpyOn::One(contract_address));
     start_prank(CheatTarget::One(contract_address), owner);
     dispatcher.upgrade(new_storage_class_hash);
 
-    let mut spy = spy_events(SpyOn::One(contract_address));
 
-
-      spy.assert_emitted(
-            @array![
-                (
-                    contract_address,
-                    UpgradeableComponent::Event::Upgraded(
-                        UpgradeableComponent::Upgraded { class_hash: new_storage_class_hash }
-                    )
+    spy.assert_emitted(
+        @array![
+            (
+                contract_address,
+                UpgradeableComponent::Event::Upgraded(
+                    UpgradeableComponent::Upgraded { class_hash: new_storage_class_hash }
                 )
-            ]
-        );
+            )
+        ]
+    );
 }
