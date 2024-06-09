@@ -85,12 +85,12 @@ mod ReferralStorage {
         // @notice Sets the referrer to be referred by the caller
         // @param _address The referrer to set
         // @dev An address can set the referrer only once
-        // @dev referrer cannot set refer himself
+        // @dev referrer cannot set refer themselves
         fn set_referrer(
             ref self: ContractState,
             _address: ContractAddress,
         ){
-            assert!(_address != get_caller_address(), "ReferralStorage: referrer cannot refer himself");
+            assert!(_address != get_caller_address(), "ReferralStorage: referrer cannot refer themselves");
 
             if(!self.referrers.read(get_caller_address()).is_non_zero()){
                 let _account = get_caller_address();
