@@ -5,13 +5,13 @@ use zeroable::Zeroable;
 #[starknet::interface]
 trait IReferralStorage<TContractState> {
     fn get_referrer(
-         self: @TContractState,
-        _account: ContractAddress,
+        self: @TContractState,
+        account: ContractAddress,
     ) -> ContractAddress;
 
     fn set_referrer(
         ref self: TContractState,
-        _address: ContractAddress,
+        address: ContractAddress,
     );
 
     fn upgrade(ref self: TContractState, new_class_hash: ClassHash);
@@ -76,26 +76,26 @@ mod ReferralStorage {
     impl ReferralStorage of super::IReferralStorage<ContractState> {
 
         fn get_referrer(
-             self: @ContractState,
-            _account: ContractAddress,
+            self: @ContractState,
+            account: ContractAddress,
         ) -> ContractAddress {
-             self.referrers.read(_account)
+             self.referrers.read(account)
         }
 
         // @notice Sets the referrer to be referred by the caller
-        // @param _address The referrer to set
+        // @param address The referrer to set
         // @dev An address can set the referrer only once
         // @dev referrer cannot set refer themselves
         fn set_referrer(
             ref self: ContractState,
-            _address: ContractAddress,
+            address: ContractAddress,
         ){
-            assert!(_address != get_caller_address(), "ReferralStorage: referrer cannot refer themselves");
+            assert!(address != get_caller_address(), "ReferralStorage: referrer cannot refer themselves");
 
             if(!self.referrers.read(get_caller_address()).is_non_zero()){
-                let _account = get_caller_address();
-                self.referrers.write(_account, _address);
-                self.emit(SetReferrer{account:_account, referrer: _address});              
+                let account = get_caller_address();
+                self.referrers.write(account, address);
+                self.emit(SetReferrer{account:account, referrer: address});              
             }
         }
 
