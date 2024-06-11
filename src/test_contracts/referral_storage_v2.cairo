@@ -125,7 +125,7 @@ mod ReferralStorageV2 {
             _code: felt252,
         ){
             assert!(self.code_owner.read(_code).is_non_zero(), "ReferralStorage: code not found");
-            assert!(self.code_owner.read(_code) != get_caller_address(), "ReferralStorage: referrer cannot refer himself");
+            assert!(self.code_owner.read(_code) != get_caller_address(), "ReferralStorage: referrer cannot refer themselves");
 
             let _account = get_caller_address();
             self.referrers.write(_account, _code);

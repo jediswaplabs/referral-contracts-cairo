@@ -36,7 +36,7 @@ fn test_set_referrer() {
 }
 
 #[test]
-#[should_panic(expected: ("ReferralStorage: referrer cannot refer himself",))]
+#[should_panic(expected: ("ReferralStorage: referrer cannot refer themselves",))]
 fn test_set_referrer_self() {
     let (contract_address,dispatcher,_owner) = setup_referral_storage_dispatcher();
     
